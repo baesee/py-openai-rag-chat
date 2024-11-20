@@ -31,7 +31,7 @@ chatgpt_service = ChatGPTService()
 async def process_pdf(
     file: UploadFile = File(...),
     source: str = Form(...),
-    api_key: Optional[str] = Header(None)
+    api_key: Optional[str] = Header(None, alias="blg-wr-api-key")
 ):
     # API 키 검증
     if not security_service.verify_api_key(api_key):
@@ -49,7 +49,7 @@ async def process_pdf(
 @app.post("/ask")
 async def ask_question(
     question: str,
-    api_key: Optional[str] = Header(None)
+    api_key: Optional[str] = Header(None, alias="blg-wr-api-key")
 ):
     # API 키 검증
     if not security_service.verify_api_key(api_key):
@@ -65,7 +65,7 @@ async def ask_question(
 @app.post("/chat")
 async def chat(
     prompt: str,
-    api_key: Optional[str] = Header(None)
+    api_key: Optional[str] = Header(None, alias="blg-wr-api-key")
 ):
     # API 키 검증
     if not security_service.verify_api_key(api_key):
@@ -80,7 +80,7 @@ async def chat(
 
 @app.get("/hello")
 async def hello(
-    api_key: Optional[str] = Header(None)
+    api_key: Optional[str] = Header(None, alias="blg-wr-api-key")
 ):
     if not security_service.verify_api_key(api_key):
         raise HTTPException(status_code=401, detail="Invalid API key")
