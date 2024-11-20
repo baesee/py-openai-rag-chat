@@ -7,6 +7,7 @@ from services.pdf_service import PDFProcessor
 from services.rag_service import RAGService
 from services.security_service import SecurityService
 from services.chatgpt_service import ChatGPTService
+import urllib.parse  # URL 디코딩을 위한 import 추가
 
 load_dotenv()
 
@@ -56,11 +57,14 @@ async def ask_question(
         raise HTTPException(status_code=401, detail="Invalid API key")
     
     try:
-        # RAG 기반 답변 생성
-        answer = await rag_service.generate_answer(question)
+        # URL 디코딩 적용
+        decoded_question = urllib.parse.unquote(question)
+        
+        # RAG 기반 답변 생성 (디코딩된 질문 사용)
+        answer = await rag_service.generate_answer(decoded_question)
         return {"answer": answer}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat")
 async def chat(
