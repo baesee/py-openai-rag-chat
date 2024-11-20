@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Header
+from fastapi import FastAPI, File, UploadFile, HTTPException, Header, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import os
@@ -30,6 +30,7 @@ chatgpt_service = ChatGPTService()
 @app.post("/process-pdf")
 async def process_pdf(
     file: UploadFile = File(...),
+    source: str = Form(...),
     api_key: Optional[str] = Header(None)
 ):
     # API 키 검증
@@ -37,8 +38,8 @@ async def process_pdf(
         raise HTTPException(status_code=401, detail="Invalid API key")
     
     try:
-        # PDF 처리 및 벡터화
-        text_chunks = await pdf_processor.process_pdf(file)
+        # PDF 처리 및 벡터화 (출처 정보 포함)
+        text_chunks = await pdf_processor.process_pdf(file, source)
         vector_ids = await rag_service.vectorize_and_store(text_chunks)
         
         return {"status": "success", "message": "PDF processed successfully"}

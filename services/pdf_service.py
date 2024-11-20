@@ -6,7 +6,7 @@ class PDFProcessor:
     def __init__(self):
         self.chunk_size = 1000  # 청크 크기 설정
         
-    async def process_pdf(self, file: UploadFile) -> list:
+    async def process_pdf(self, file: UploadFile, source: str) -> list:
         # PDF 파일 읽기
         pdf_content = await file.read()
         pdf_file = io.BytesIO(pdf_content)
@@ -15,8 +15,10 @@ class PDFProcessor:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         text_content = ""
         
-        for page in pdf_reader.pages:
-            text_content += page.extract_text()
+        for page_num, page in enumerate(pdf_reader.pages, 1):
+            # 페이지 텍스트에 출처와 페이지 정보 추가
+            page_text = page.extract_text()
+            text_content += f"\n[출처: {source}, 페이지: {page_num}]\n{page_text}"
             
         # 텍스트를 청크로 분할
         chunks = self._split_into_chunks(text_content)
